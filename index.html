@@ -199,6 +199,7 @@
       background:
         linear-gradient(170deg, rgba(24, 29, 42, 0.94) 0%, rgba(11, 14, 21, 0.98) 100%);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #f97316;
       box-shadow:
         0 16px 30px -14px rgba(0, 0, 0, 0.88),
         inset 0 1px 0 rgba(255, 255, 255, 0.12);
@@ -274,6 +275,190 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    /* =========================================================
+       LIGHT MODE THEME OVERRIDES (html.light — BOLD BORDERS)
+       ========================================================= */
+    html.light body {
+      background:
+        radial-gradient(circle at 15% 8%, rgba(249, 115, 22, 0.14), transparent 38%),
+        radial-gradient(circle at 85% 18%, rgba(245, 158, 11, 0.10), transparent 40%),
+        linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      color: #0f172a;
+    }
+
+    html.light .cinema-sidebar {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border-right: 2px solid #cbd5e1;
+      box-shadow:
+        10px 0 28px -12px rgba(15, 23, 42, 0.16),
+        inset -1px 0 0 rgba(255, 255, 255, 0.95);
+    }
+
+    html.light .section-header- {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1.5px solid #94a3b8;
+      border-left: 5px solid #f97316;
+      box-shadow:
+        0 10px 22px -12px rgba(15, 23, 42, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    html.light .section-header- h2,
+    html.light .section-header- h1 {
+      color: #0f172a;
+      text-shadow: none;
+    }
+
+    html.light .section-header- p {
+      color: #475569;
+    }
+
+    html.light .card-header-band {
+      background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-bottom: 1.5px solid #cbd5e1;
+      box-shadow:
+        0 3px 8px -6px rgba(15, 23, 42, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    html.light .cinema-hero {
+      background:
+        linear-gradient(130deg, rgba(249, 115, 22, 0.16) 0%, #ffffff 48%, #f8fafc 100%);
+      border: 2px solid #94a3b8;
+      box-shadow:
+        0 18px 38px -16px rgba(15, 23, 42, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    html.light .cinema-hero::after {
+      background: linear-gradient(90deg, transparent 62%, rgba(255, 255, 255, 0.45) 100%);
+    }
+
+    html.light .cinema-hero h1 {
+      color: #0f172a;
+      text-shadow: none;
+    }
+
+    html.light .cinema-hero p {
+      color: #334155;
+    }
+
+    html.light .div-card- {
+      background:
+        linear-gradient(165deg, #ffffff 0%, #ffffff 65%, #f8fafc 100%);
+      border: 1.5px solid #94a3b8;
+      box-shadow:
+        0 12px 24px -14px rgba(15, 23, 42, 0.16),
+        0 4px 10px -6px rgba(15, 23, 42, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    html.light .div-card-.border-orange-500\/50 {
+      border-color: #f97316 !important;
+      border-width: 2px !important;
+    }
+
+    html.light .div-card-:hover {
+      border-color: #ea580c;
+      box-shadow:
+        0 20px 36px -12px rgba(15, 23, 42, 0.2),
+        0 10px 22px -10px rgba(249, 115, 22, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+
+    html.light .stat-tile- {
+      background:
+        linear-gradient(170deg, #ffffff 0%, #f8fafc 100%);
+      border: 1.5px solid #94a3b8;
+      border-left: 5px solid #f97316;
+      box-shadow:
+        0 12px 24px -14px rgba(15, 23, 42, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    html.light .stat-tile-:hover {
+      border-color: #ea580c;
+      box-shadow:
+        0 18px 30px -14px rgba(15, 23, 42, 0.2),
+        0 8px 18px -10px rgba(249, 115, 22, 0.2);
+    }
+
+    html.light .btn--dark {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border: 1.5px solid #94a3b8;
+      box-shadow:
+        0 6px 14px -8px rgba(15, 23, 42, 0.18),
+        0 2px 0 #94a3b8,
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      color: #0f172a;
+    }
+
+    html.light .btn--dark:hover {
+      border-color: #ea580c;
+      color: #ea580c;
+    }
+
+    html.light .table-head-modern {
+      background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+      border-bottom: 2px solid #94a3b8;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      color: #0f172a;
+    }
+
+    /* High-contrast Light Mode text, badge & border visibility */
+    html.light .text-white { color: #0f172a !important; }
+    html.light .btn--orange,
+    html.light .btn--orange * { color: #090d16 !important; }
+    html.light .text-slate-100 { color: #0f172a !important; }
+    html.light .text-slate-200 { color: #1e293b !important; }
+    html.light .text-slate-300 { color: #334155 !important; }
+    html.light .text-slate-400 { color: #475569 !important; }
+    html.light .text-slate-500 { color: #64748b !important; }
+
+    html.light .text-orange-300 { color: #c2410c !important; }
+    html.light .text-orange-400 { color: #ea580c !important; }
+    html.light .text-emerald-300 { color: #047857 !important; }
+    html.light .text-emerald-400 { color: #059669 !important; }
+    html.light .text-amber-300 { color: #b45309 !important; }
+    html.light .text-violet-300 { color: #6d28d9 !important; }
+
+    html.light .bg-orange-500\/15 { background-color: rgba(249, 115, 22, 0.14) !important; }
+    html.light .bg-orange-500\/20 { background-color: rgba(249, 115, 22, 0.18) !important; }
+    html.light .border-orange-500\/30 { border-color: rgba(234, 88, 12, 0.55) !important; }
+    html.light .border-orange-500\/35 { border-color: rgba(234, 88, 12, 0.6) !important; }
+    html.light .border-orange-500\/40 { border-color: rgba(234, 88, 12, 0.65) !important; }
+    html.light .bg-emerald-500\/15,
+    html.light .bg-emerald-500\/20 { background-color: rgba(16, 185, 129, 0.16) !important; }
+    html.light .border-emerald-500\/35,
+    html.light .border-emerald-500\/40 { border-color: rgba(5, 150, 105, 0.55) !important; }
+
+    html.light .border-white\/10,
+    html.light .border-white\/15,
+    html.light .border-white\/\[0\.07\],
+    html.light .border-white\/\[0\.08\],
+    html.light .border-white\/\[0\.1\] {
+      border-color: #cbd5e1 !important;
+    }
+
+    html.light .divide-y > * + * {
+      border-color: #cbd5e1 !important;
+    }
+
+    html.light .bg-\[\#07090e\]\/90 { background-color: rgba(255, 255, 255, 0.98) !important; }
+    html.light .bg-\[\#07090e\] { background-color: #ffffff !important; }
+    html.light .bg-\[\#050609\]\/95 { background-color: rgba(248, 250, 252, 0.98) !important; }
+    html.light .bg-white\/\[0\.04\] { background-color: #f1f5f9 !important; }
+    html.light .bg-white\/\[0\.05\] { background-color: #e2e8f0 !important; }
+    html.light .bg-white\/\[0\.06\] { background-color: #e2e8f0 !important; }
+    html.light .bg-white\/\[0\.07\] { background-color: #e2e8f0 !important; }
+    html.light .bg-white\/\[0\.08\] { background-color: #cbd5e1 !important; }
+    html.light .hover\:bg-white\/\[0\.03\]:hover { background-color: #f1f5f9 !important; }
+    html.light .bg-black\/25 { background-color: #f1f5f9 !important; }
+    html.light footer {
+      background-color: rgba(248, 250, 252, 0.98) !important;
+      border-top: 1.5px solid #cbd5e1 !important;
+    }
   </style>
 </head>
 <body class="min-h-screen flex bg-[#050609] text-slate-100 antialiased selection:bg-orange-500/30 selection:text-orange-200">
@@ -338,8 +523,22 @@
       </button>
     </div>
 
-    <!-- Bottom Settings Action -->
-    <div class="p-4 border-t border-white/10 bg-black/25">
+    <!-- Appearance Mode Toggle & Bottom Settings Action -->
+    <div class="p-4 border-t border-white/10 bg-black/25 space-y-2.5">
+      <button id="themeToggleBtn" onclick="toggleAppearanceTheme()" class="sidebar-item-btn w-full h-11 flex items-center justify-between px-3.5 rounded-xl text-xs font-bold btn--dark text-slate-200 hover:text-white transition-all duration-300 cursor-pointer" title="Switch Dark / Light Mode">
+        <span class="sidebar-item-inner flex items-center gap-2.5">
+          <svg id="themeIconSun" class="w-4 h-4 text-amber-400 shrink-0 hidden" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg id="themeIconMoon" class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+          </svg>
+          <span id="themeLabel" class="sidebar-label whitespace-nowrap">Dark Mode</span>
+        </span>
+        <span id="themeBadge" class="sidebar-label whitespace-nowrap text-[10px] font-mono-code font-extrabold px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/35">DARK</span>
+      </button>
+
       <button onclick="openPreviewModal('Workspace Settings', 'Pengaturan integrasi sheet, autentikasi, dan preferensi tampilan dashboard.'); toggleMobileSidebar(false);" class="sidebar-item-btn w-full h-11 flex items-center justify-between px-3.5 rounded-xl text-xs font-bold btn--dark text-slate-200 hover:text-white transition-all duration-300 cursor-pointer" title="Settings">
         <span class="sidebar-item-inner flex items-center gap-2.5">
           <svg class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -967,6 +1166,36 @@
       if (chev) chev.textContent = hubNeedAttentionOpen ? "▾" : "▸";
     }
 
+    let appearanceMode = localStorage.getItem("blip_appearance_mode") || "dark";
+
+    function applyAppearanceTheme(mode) {
+      appearanceMode = mode === "light" ? "light" : "dark";
+      const htmlEl = document.documentElement;
+      const isLight = appearanceMode === "light";
+
+      htmlEl.classList.toggle("light", isLight);
+      htmlEl.classList.toggle("dark", !isLight);
+
+      const sunIcon = document.getElementById("themeIconSun");
+      const moonIcon = document.getElementById("themeIconMoon");
+      const labelEl = document.getElementById("themeLabel");
+      const badgeEl = document.getElementById("themeBadge");
+
+      if (sunIcon) sunIcon.classList.toggle("hidden", !isLight);
+      if (moonIcon) moonIcon.classList.toggle("hidden", isLight);
+      if (labelEl) labelEl.textContent = isLight ? "Light Mode" : "Dark Mode";
+      if (badgeEl) badgeEl.textContent = isLight ? "LIGHT" : "DARK";
+
+      try {
+        localStorage.setItem("blip_appearance_mode", appearanceMode);
+      } catch (e) {}
+    }
+
+    function toggleAppearanceTheme() {
+      applyAppearanceTheme(appearanceMode === "dark" ? "light" : "dark");
+    }
+
+    applyAppearanceTheme(appearanceMode);
     renderSidebarNav();
     renderHubView();
     renderHubNeedAttentionQueue();
