@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLiP — Monitoring Work Order System (Netflix Layout)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-cinema: #050609;
+      --bg-elevated: #0f1219;
+      --accent-orange: #f97316;
+      --accent-amber: #f59e0b;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 8%, rgba(249, 115, 22, 0.16), transparent 36%),
+        radial-gradient(circle at 85% 18%, rgba(245, 158, 11, 0.10), transparent 38%),
+        linear-gradient(180deg, #06070b 0%, #040507 100%);
+      color: #f8fafc;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .font-mono-code {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* =========================================================
+       3D ELEVATED SIDEBAR + SECTION HEADERS
+       ========================================================= */
+    .cinema-sidebar {
+      background: linear-gradient(180deg, rgba(18, 22, 34, 0.98) 0%, rgba(10, 12, 19, 0.99) 100%);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(249, 115, 22, 0.32);
+      box-shadow:
+        16px 0 40px -12px rgba(0, 0, 0, 0.95),
+        4px 0 20px -8px rgba(249, 115, 22, 0.18),
+        inset -1px 0 0 rgba(255, 255, 255, 0.14);
+      transition: width 0.34s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: width;
+    }
+
+    .sidebar-label {
+      display: inline-block;
+      max-width: 200px;
+      opacity: 1;
+      overflow: hidden;
+      transition:
+        max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.2s ease,
+        margin 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (min-width: 1024px) {
+      #appSidebar.is-collapsed {
+        width: 76px !important;
+      }
+      #appSidebar.is-collapsed .sidebar-label {
+        max-width: 0 !important;
+        opacity: 0 !important;
+        margin: 0 !important;
+        pointer-events: none;
+      }
+      #appSidebar.is-collapsed .sidebar-brand-row {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.625rem;
+      }
+      #appSidebar.is-collapsed .sidebar-brand-trigger {
+        width: 44px;
+        justify-content: center;
+        gap: 0 !important;
+      }
+      #appSidebar.is-collapsed .sidebar-item-btn {
+        width: 44px !important;
+        height: 44px !important;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 !important;
+        gap: 0 !important;
+        justify-content: center !important;
+      }
+      #appSidebar.is-collapsed .sidebar-item-inner {
+        gap: 0 !important;
+        justify-content: center !important;
+      }
+    }
+
+    .section-header- {
+      position: relative;
+      background: linear-gradient(180deg, rgba(28, 34, 50, 0.95) 0%, rgba(14, 18, 28, 0.98) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-left: 4px solid #f97316;
+      box-shadow:
+        0 16px 32px -12px rgba(0, 0, 0, 0.9),
+        0 4px 16px -6px rgba(249, 115, 22, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.65);
+    }
+
+    .card-header-band {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow:
+        0 8px 16px -10px rgba(0, 0, 0, 0.85),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    /* Cinema / Netflix-inspired Depth Surfaces */
+    .cinema-hero {
+      position: relative;
+      background:
+        linear-gradient(130deg, rgba(249, 115, 22, 0.22) 0%, rgba(20, 25, 38, 0.96) 44%, rgba(10, 13, 20, 0.99) 100%);
+      border: 1px solid rgba(249, 115, 22, 0.28);
+      box-shadow:
+        0 30px 64px -16px rgba(0, 0, 0, 0.92),
+        0 10px 30px -12px rgba(249, 115, 22, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.7);
+      transform-style: preserve-3d;
+    }
+
+    .cinema-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, transparent 58%, rgba(5, 6, 9, 0.65) 100%);
+      pointer-events: none;
+    }
+
+    .shelf-track {
+      perspective: 1400px;
+    }
+
+    .div-card- {
+      position: relative;
+      background:
+        linear-gradient(165deg, rgba(30, 35, 50, 0.94) 0%, rgba(14, 17, 26, 0.97) 58%, rgba(8, 10, 16, 0.99) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow:
+        0 18px 34px -14px rgba(0, 0, 0, 0.88),
+        0 6px 14px -6px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      transform-style: preserve-3d;
+      transition:
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.34s ease;
+      will-change: transform;
+    }
+
+    .div-card-::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 15%), rgba(249, 115, 22, 0.24), transparent 68%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .div-card-:hover {
+      transform: translateY(-9px) scale(1.035) rotateX(4deg) rotateY(-3deg);
+      border-color: rgba(249, 115, 22, 0.6);
+      box-shadow:
+        0 28px 50px -12px rgba(0, 0, 0, 0.95),
+        0 14px 28px -10px rgba(249, 115, 22, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      z-index: 15;
+    }
+
+    .div-card-:hover::before {
+      opacity: 1;
+    }
+
+    .stat-tile- {
+      position: relative;
+      background:
+        linear-gradient(170deg, rgba(24, 29, 42, 0.94) 0%, rgba(11, 14, 21, 0.98) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow:
+        0 16px 30px -14px rgba(0, 0, 0, 0.88),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.28s ease,
+        box-shadow 0.28s ease;
+    }
+
+    .stat-tile-:hover {
+      transform: translateY(-5px) scale(1.02);
+      border-color: rgba(249, 115, 22, 0.45);
+      box-shadow:
+        0 22px 38px -14px rgba(0, 0, 0, 0.92),
+        0 10px 22px -12px rgba(249, 115, 22, 0.22);
+    }
+
+    .btn--orange {
+      background: linear-gradient(180deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
+      box-shadow:
+        0 10px 22px -6px rgba(249, 115, 22, 0.55),
+        0 3px 0 #9a3412,
+        inset 0 1px 0 rgba(255, 255, 255, 0.38);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+    }
+
+    .btn--orange:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+      box-shadow:
+        0 14px 26px -6px rgba(249, 115, 22, 0.65),
+        0 4px 0 #9a3412,
+        inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    }
+
+    .btn--orange:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 5px 12px -4px rgba(249, 115, 22, 0.42),
+        0 1px 0 #9a3412;
+    }
+
+    .btn--dark {
+      background: linear-gradient(180deg, rgba(40, 47, 66, 0.94) 0%, rgba(18, 22, 33, 0.98) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow:
+        0 8px 18px -8px rgba(0, 0, 0, 0.85),
+        0 2px 0 rgba(0, 0, 0, 0.75),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .btn--dark:hover {
+      transform: translateY(-1px);
+      border-color: rgba(249, 115, 22, 0.5);
+    }
+
+    .btn--dark:active {
+      transform: translateY(1px);
+    }
+
+    .table-head-modern {
+      background: linear-gradient(180deg, rgba(32, 38, 54, 0.9) 0%, rgba(18, 22, 32, 0.95) 100%);
+      border-bottom: 1px solid rgba(249, 115, 22, 0.25);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex bg-[#050609] text-slate-100 antialiased selection:bg-orange-500/30 selection:text-orange-200">
+
+  <!-- MOBILE SIDEBAR BACKDROP -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm hidden lg:hidden"></div>
+
+  <!-- FLOATING MOBILE MENU BUTTON (ONLY SHOWN ON SMALL SCREENS) -->
+  <button onclick="toggleMobileSidebar(true)" class="lg:hidden fixed bottom-5 right-5 z-30 w-12 h-12 rounded-2xl btn--orange text-slate-950 flex items-center justify-center shadow-2xl cursor-pointer" title="Open Menu">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+
+  <!-- =========================================================
+       LEFT SIDEBAR NAVIGATION (PRECISION COLLAPSE + CLEAN BRAND)
+       ========================================================= -->
+  <aside id="appSidebar" class="fixed lg:sticky top-0 left-0 z-50 lg:z-20 h-screen w-[272px] shrink-0 cinema-sidebar flex flex-col justify-between -translate-x-full lg:translate-x-0 overflow-x-hidden">
+    <!-- Top Brand & Minimalist Controls -->
+    <div class="p-4 space-y-3.5 overflow-y-auto overflow-x-hidden no-scrollbar">
+      <!-- Brand Identity + Desktop Expand/Collapse Toggle -->
+      <div class="sidebar-brand-row flex items-center justify-between gap-2 pb-3.5 border-b border-white/10">
+        <button onclick="switchPortalView('hub'); toggleMobileSidebar(false);" class="sidebar-brand-trigger flex items-center gap-3 text-left group cursor-pointer min-w-0" title="PT. BLiP Integration Provider">
+          <div class="w-11 h-11 rounded-xl btn--orange text-slate-950 font-extrabold text-base flex items-center justify-center shrink-0">
+            B
+          </div>
+          <div class="sidebar-label font-extrabold text-[13px] tracking-tight text-orange-400 leading-snug group-hover:text-orange-300 transition">
+            PT. BLiP Integration Provider
+          </div>
+        </button>
+
+        <!-- Desktop Collapse / Expand Button -->
+        <button id="sidebarCollapseBtn" onclick="toggleDesktopSidebar()" class="hidden lg:flex w-11 h-11 rounded-xl btn--dark items-center justify-center text-slate-300 hover:text-orange-300 shrink-0 cursor-pointer" title="Collapse / Expand Sidebar">
+          <svg id="sidebarCollapseIcon" class="w-4 h-4 transition-transform duration-300 ease-out" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        <!-- Mobile Close Button -->
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden p-1.5 rounded-lg btn--dark text-slate-300 hover:text-white cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <!-- Status Pill -->
+      <div class="sidebar-item-btn w-full h-11 flex items-center justify-between px-3.5 rounded-xl bg-white/[0.04] border border-white/10 transition-all duration-300" title="Shelf Ready • ALL 0">
+        <span class="sidebar-item-inner inline-flex items-center gap-2.5 text-[11px] font-bold text-emerald-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,1)] shrink-0"></span>
+          <span class="sidebar-label whitespace-nowrap">Shelf Ready</span>
+        </span>
+        <span class="sidebar-label whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-mono-code font-extrabold bg-orange-500/20 text-orange-300 border border-orange-500/40">
+          ALL 0
+        </span>
+      </div>
+
+      <!-- + New Order Primary CTA -->
+      <button onclick="openPreviewModal('New Work Order Form', 'Modal layout untuk membuat work order baru (all counter di-set 0 pada mode preview).'); toggleMobileSidebar(false);" class="sidebar-item-btn w-full h-11 px-3.5 rounded-xl text-xs font-extrabold btn--orange text-slate-950 flex items-center justify-center gap-2 cursor-pointer" title="New Order">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span class="sidebar-label whitespace-nowrap">New Order</span>
+      </button>
+    </div>
+
+    <!-- Bottom Settings Action -->
+    <div class="p-4 border-t border-white/10 bg-black/25">
+      <button onclick="openPreviewModal('Workspace Settings', 'Pengaturan integrasi sheet, autentikasi, dan preferensi tampilan dashboard.'); toggleMobileSidebar(false);" class="sidebar-item-btn w-full h-11 flex items-center justify-between px-3.5 rounded-xl text-xs font-bold btn--dark text-slate-200 hover:text-white transition-all duration-300 cursor-pointer" title="Settings">
+        <span class="sidebar-item-inner flex items-center gap-2.5">
+          <svg class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span class="sidebar-label whitespace-nowrap">Settings</span>
+        </span>
+        <span class="sidebar-label whitespace-nowrap text-[10px] font-mono-code text-slate-400">v4</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- RIGHT MAIN CONTENT AREA -->
+  <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+    <main class="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 space-y-8">
+
+      <!-- =========================================================
+           VIEW 1: ALL DIVISIONS SHELF (LANDING)
+           ========================================================= -->
+      <section id="view-hub" class="space-y-8">
+      <!-- Spotlight Hero Banner -->
+      <div class="cinema-hero rounded-3xl p-6 sm:p-8">
+        <div class="relative z-10 space-y-4 max-w-4xl">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+            BLIP MONITORING WORK ORDERS SYSTEM
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-200/90 leading-relaxed font-semibold">
+            <span class="text-orange-300">Sales • Business Integration • Procurement • Technical Operation • Network Operation • Business and Development • Putchasing</span>
+          </p>
+          <div class="pt-1">
+            <button onclick="scrollDivisions(340)" class="px-4 py-2.5 rounded-xl text-xs font-extrabold btn--orange text-slate-950 cursor-pointer">
+              Explore All Progress Bellow
+            </button>
+          </div>
+        </div>
+      </div>
+
+        <!-- Horizontal Division Shelf -->
+        <div class="space-y-4">
+          <div class="section-header- rounded-2xl px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.95)]"></span>
+              <div>
+                <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
+                  7 Division Workspaces
+                </h2>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Pilih kartu divisi untuk masuk ke workspace atau preview modul</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="hidden md:inline-flex px-2.5 py-1 rounded-lg text-[11px] font-mono-code font-bold bg-white/[0.05] text-slate-300 border border-white/10">
+                7 Modules
+              </span>
+              <button onclick="scrollDivisions(-340)" class="w-9 h-9 rounded-xl btn--dark flex items-center justify-center text-white font-bold hover:text-orange-300 cursor-pointer" title="Scroll Left">
+                &lt;
+              </button>
+              <button onclick="scrollDivisions(340)" class="w-9 h-9 rounded-xl btn--dark flex items-center justify-center text-white font-bold hover:text-orange-300 cursor-pointer" title="Scroll Right">
+                &gt;
+              </button>
+            </div>
+          </div>
+
+          <div class="shelf-track py-3 -my-3">
+            <div id="division-cards-strip" class="flex gap-4 overflow-x-auto no-scrollbar px-1 py-3">
+              <!-- Rendered by JS in exact requested order -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Cross-Division Overview (All 0) -->
+        <div class="space-y-4">
+          <div class="section-header- rounded-2xl px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.95)]"></span>
+              <div>
+                <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
+                  All Division Work Orders Progress Summary
+                </h2>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Agregasi status work order lintas seluruh divisi</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-mono-code font-bold text-orange-300 px-3 py-1.5 rounded-xl bg-orange-500/15 border border-orange-500/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                Baseline: 0 Orders
+              </span>
+              <button onclick="scrollSummary(-340)" class="w-9 h-9 rounded-xl btn--dark flex items-center justify-center text-white font-bold hover:text-orange-300 cursor-pointer" title="Scroll Left">
+                &lt;
+              </button>
+              <button onclick="scrollSummary(340)" class="w-9 h-9 rounded-xl btn--dark flex items-center justify-center text-white font-bold hover:text-orange-300 cursor-pointer" title="Scroll Right">
+                &gt;
+              </button>
+            </div>
+          </div>
+
+          <div class="shelf-track py-3 -my-3">
+            <div id="hub-overview-grid" class="flex gap-4 overflow-x-auto no-scrollbar px-1 py-3">
+              <!-- Rendered by JS (all 0) -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Need Attention Orders Section on Hub -->
+        <div class="stat-tile- rounded-2xl overflow-hidden">
+          <button onclick="toggleHubNeedAttention()" class="w-full card-header-band px-5 py-4 flex items-center justify-between gap-4 text-left hover:bg-white/[0.03] transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.95)]"></span>
+              <div>
+                <h2 class="text-sm sm:text-base font-extrabold text-white tracking-tight">NEED ATTENTION ORDERS</h2>
+                <p class="text-xs text-slate-300/80">Daftar tiket prioritas yang membutuhkan tindak lanjut</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-full text-xs font-mono-code font-extrabold bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-[0_2px_10px_rgba(249,115,22,0.2)]">
+                3 Items
+              </span>
+              <span id="hubNeedAttentionChevron" class="w-7 h-7 rounded-lg btn--dark flex items-center justify-center text-white text-xs font-bold">▾</span>
+            </div>
+          </button>
+
+          <div id="hubNeedAttentionBody" class="p-4 sm:p-5 space-y-4">
+            <div class="rounded-xl border border-white/[0.1] bg-[#07090e]/90 shadow-inner overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="table-head-modern text-[11px] font-extrabold uppercase tracking-wider">
+                    <th class="py-3.5 px-4 w-12 text-center">#</th>
+                    <th class="py-3.5 px-4">CUSTOMER</th>
+                    <th class="py-3.5 px-4">TICKET ID</th>
+                    <th class="py-3.5 px-4">STATUS TICKET</th>
+                    <th class="py-3.5 px-4">NOTE</th>
+                    <th class="py-3.5 px-4">ASSIGNED DIVISION</th>
+                    <th class="py-3.5 px-4">PIC BLIP</th>
+                  </tr>
+                </thead>
+                <tbody id="hub-need-attention-tbody" class="divide-y divide-white/[0.07] text-xs">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =========================================================
+           VIEW 2: DIVISION WORKSPACE DETAIL (ALL 0)
+           ========================================================= -->
+      <section id="view-bi" class="hidden space-y-6">
+        <div class="section-header- rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <button onclick="switchPortalView('hub')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold btn--dark text-white hover:text-orange-300 cursor-pointer">
+              ← All Divisions
+            </button>
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h1 id="detailTitle" class="text-base sm:text-lg font-extrabold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">
+                  Business Integration Work Orders
+                </h1>
+                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-orange-500/20 text-orange-300 border border-orange-500/40">
+                  Stage View
+                </span>
+              </div>
+              <p class="text-xs text-slate-300/80">Pipeline stage stepper &amp; activity log layout (0 active items)</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="searchInput" type="text" placeholder="Search customer / ticket ID..." class="w-full sm:w-60 bg-[#07090e] border border-white/15 focus:border-orange-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-400 focus:outline-none shadow-inner" />
+          </div>
+        </div>
+
+        <!-- 6 KPI Cards (All 0) -->
+        <div id="kpi-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <!-- Rendered by JS (all 0) -->
+        </div>
+
+        <!-- Need Attention Collapsible Section -->
+        <div class="stat-tile- rounded-2xl overflow-hidden">
+          <button onclick="toggleNeedAttention()" class="w-full card-header-band px-5 py-4 flex items-center justify-between gap-4 text-left hover:bg-white/[0.03] transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.95)]"></span>
+              <div>
+                <h2 class="text-sm sm:text-base font-extrabold text-white tracking-tight">Need Attention Queue</h2>
+                <p class="text-xs text-slate-300/80">Open, On Progress &amp; Pending work orders requiring follow-up</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-full text-xs font-mono-code font-extrabold bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-[0_2px_10px_rgba(249,115,22,0.2)]">
+                0 Items
+              </span>
+              <span id="needAttentionChevron" class="w-7 h-7 rounded-lg btn--dark flex items-center justify-center text-white text-xs font-bold">▾</span>
+            </div>
+          </button>
+
+          <div id="needAttentionBody" class="p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <button data-tab="All" onclick="setActiveTab('All')" class="bi-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-extrabold btn--orange text-slate-950 cursor-pointer">All (0)</button>
+                <button data-tab="Survey" onclick="setActiveTab('Survey')" class="bi-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold btn--dark text-slate-300 hover:text-white cursor-pointer">Survey (0)</button>
+                <button data-tab="Handover" onclick="setActiveTab('Handover')" class="bi-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold btn--dark text-slate-300 hover:text-white cursor-pointer">Handover (0)</button>
+                <button data-tab="Mapping" onclick="setActiveTab('Mapping')" class="bi-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold btn--dark text-slate-300 hover:text-white cursor-pointer">Mapping (0)</button>
+              </div>
+
+              <div id="status-filter-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <div id="main-table-container" class="rounded-xl border border-white/[0.1] bg-[#07090e]/90 shadow-inner">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/[0.1] bg-[#050609]/95 py-4 px-4 sm:px-6 text-xs text-slate-400">
+      <div class="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <span>BLiP Monitoring Work Order System • Netflix-Style Layout (Zero-Data Mode)</span>
+        <span class="font-mono-code text-[11px] text-slate-500">Sidebar Navigation • Elevated Headers • Orange Accents</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- GENERIC PREVIEW MODAL -->
+  <div id="previewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="stat-tile- rounded-2xl max-w-md w-full overflow-hidden border-orange-500/45">
+      <div class="card-header-band px-5 py-3.5 flex items-center justify-between">
+        <h3 id="previewModalTitle" class="text-sm font-extrabold text-white">Preview</h3>
+        <button onclick="closePreviewModal()" class="text-slate-300 hover:text-white text-sm font-bold cursor-pointer">✕</button>
+      </div>
+      <div class="p-5 space-y-4">
+        <p id="previewModalDesc" class="text-xs text-slate-300 leading-relaxed"></p>
+        <div class="flex justify-end pt-1">
+          <button onclick="closePreviewModal()" class="px-4 py-2 rounded-xl text-xs font-extrabold btn--orange text-slate-950 cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // ZERO-DATA LAYOUT STATE (ORDERED DIVISIONS)
+    // =========================================================
+    const DIVISIONS = [
+      { key: "sales", name: "Sales", code: "SLS", status: "Soon", desc: "Account leads, proposals & service feasibility requests.", active: false },
+      { key: "bi", name: "Business Integration", code: "BI", status: "Live", desc: "Mapping, Survey & Handover work order pipelines.", active: true },
+      { key: "proc", name: "Procurement", code: "PRC", status: "Soon", desc: "Hardware BOM, vendor sourcing & allocation tracking.", active: false },
+      { key: "techop", name: "Technical Operation", code: "TO", status: "Soon", desc: "Field deployment, site splicing, installation & handover.", active: false },
+      { key: "netop", name: "Network Operation", code: "NOC", status: "Soon", desc: "Core routing, dark fiber, Metro-E & BGP monitoring.", active: false },
+      { key: "bizdev", name: "Business and Development", code: "BND", status: "Soon", desc: "Expansion plans, partnership initiatives & new segments.", active: false },
+      { key: "purch", name: "Putchasing", code: "PUR", status: "Soon", desc: "Purchase orders, delivery tracking & supplier fulfillment.", active: false }
+    ];
+
+    let activePortalView = "hub";
+    let activeDivisionKey = null;
+    let activeTab = "All";
+    let needAttentionOpen = true;
+
+    let sidebarCollapsed = false;
+
+    function toggleDesktopSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById("appSidebar");
+      const icon = document.getElementById("sidebarCollapseIcon");
+      sidebar.classList.toggle("is-collapsed", sidebarCollapsed);
+      if (icon) {
+        icon.style.transform = sidebarCollapsed ? "rotate(180deg)" : "rotate(0deg)";
+      }
+    }
+
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById("appSidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      if (open) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      }
+    }
+
+    function renderSidebarNav() {
+      // Minimalist sidebar: brand logo returns to All Divisions hub
+    }
+
+    function switchPortalView(view, divisionName = "Business Integration", divisionKey = "bi") {
+      activePortalView = view;
+      activeDivisionKey = view === "bi" ? divisionKey : null;
+      const hubEl = document.getElementById("view-hub");
+      const biEl = document.getElementById("view-bi");
+      const detailTitle = document.getElementById("detailTitle");
+
+      if (view === "bi") {
+        hubEl.classList.add("hidden");
+        biEl.classList.remove("hidden");
+        if (detailTitle) detailTitle.textContent = `${divisionName} Work Orders`;
+        renderBiWorkspace();
+      } else {
+        biEl.classList.add("hidden");
+        hubEl.classList.remove("hidden");
+        renderHubView();
+      }
+      renderSidebarNav();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function scrollDivisions(delta) {
+      const strip = document.getElementById("division-cards-strip");
+      if (strip) strip.scrollBy({ left: delta, behavior: "smooth" });
+    }
+
+    function scrollSummary(delta) {
+      const strip = document.getElementById("hub-overview-grid");
+      if (strip) strip.scrollBy({ left: delta, behavior: "smooth" });
+    }
+
+    function bindCardTilt() {
+      document.querySelectorAll(".div-card-").forEach(card => {
+        card.addEventListener("mousemove", e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const rx = ((y / rect.height) - 0.5) * -8;
+          const ry = ((x / rect.width) - 0.5) * 9;
+          card.style.setProperty("--mx", `${x}px`);
+          card.style.setProperty("--my", `${y}px`);
+          card.style.transform = `translateY(-9px) scale(1.035) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "";
+        });
+      });
+    }
+
+    function renderHubView() {
+      const strip = document.getElementById("division-cards-strip");
+      strip.innerHTML = DIVISIONS.map((div, idx) => {
+        const badgeClass = div.active
+          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-[0_0_14px_rgba(16,185,129,0.25)]"
+          : "bg-white/[0.07] text-slate-200 border-white/15";
+        const borderClass = div.active
+          ? "border-orange-500/50 ring-1 ring-orange-500/30"
+          : "";
+        const clickAction = div.active
+          ? `switchPortalView('bi', '${div.name}', '${div.key}')`
+          : `openPreviewModal('${div.name} (${div.code})', '${div.desc} Layout slot siap untuk modul divisi ${div.name} (data saat ini: 0).')`;
+
+        return `
+          <button onclick="${clickAction}" class="div-card- ${borderClass} rounded-2xl overflow-hidden min-w-[252px] sm:min-w-[276px] flex flex-col justify-between text-left shrink-0 cursor-pointer">
+            <!-- Elevated Card Top Header Band -->
+            <div class="card-header-band px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-mono-code text-slate-300 font-extrabold">#${idx + 1}</span>
+                <span class="px-2 py-0.5 rounded-lg text-[10px] font-mono-code font-extrabold bg-orange-500/20 text-orange-300 border border-orange-500/35">
+                  ${div.code}
+                </span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${badgeClass}">
+                ${div.status}
+              </span>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+              <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-white tracking-tight">${div.name}</h3>
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">${div.desc}</p>
+              </div>
+
+              <div class="pt-3 border-t border-white/[0.1] flex items-center justify-between text-xs">
+                <span class="text-slate-300">Orders: <strong class="font-mono-code text-white">0</strong></span>
+                <span class="text-orange-400 font-extrabold text-[11px] tracking-wide">Preview</span>
+              </div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      bindCardTilt();
+
+      const summaryCards = [
+        { label: "Total Orders", value: 0, accent: "text-orange-400", bar: "bg-orange-500" },
+        { label: "Open", value: 0, accent: "text-rose-400", bar: "bg-rose-500" },
+        { label: "On Progress", value: 0, accent: "text-amber-300", bar: "bg-amber-400" },
+        { label: "Pending", value: 0, accent: "text-violet-300", bar: "bg-violet-500" },
+        { label: "Cancelled", value: 0, accent: "text-slate-300", bar: "bg-slate-500" },
+        { label: "Handover", value: 0, accent: "text-sky-400", bar: "bg-sky-400" },
+        { label: "Completed", value: 0, accent: "text-emerald-400", bar: "bg-emerald-400" }
+      ];
+
+      document.getElementById("hub-overview-grid").innerHTML = summaryCards.map((card, idx) => `
+        <div class="div-card- rounded-2xl overflow-hidden min-w-[252px] sm:min-w-[276px] flex flex-col justify-between shrink-0">
+          <div class="card-header-band px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-mono-code text-slate-300 font-extrabold">#${idx + 1}</span>
+              <span class="text-xs sm:text-sm font-extrabold text-white tracking-tight">${card.label}</span>
+            </div>
+            <span class="text-[11px] font-mono-code font-bold text-slate-400">0%</span>
+          </div>
+          <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+            <div class="text-2xl font-extrabold font-mono-code ${card.accent}">${card.value}</div>
+            <div class="w-full h-1.5 rounded-full bg-white/[0.08] overflow-hidden shadow-inner">
+              <div class="h-full ${card.bar} rounded-full" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+      bindCardTilt();
+    }
+
+    function renderBiWorkspace() {
+      const kpiItems = [
+        { key: "ALL", label: "Total Orders", color: "text-orange-400", bar: "bg-orange-500" },
+        { key: "Open", label: "Open", color: "text-rose-400", bar: "bg-rose-500" },
+        { key: "On Progress", label: "On Progress", color: "text-amber-300", bar: "bg-amber-400" },
+        { key: "Pending", label: "Pending", color: "text-violet-300", bar: "bg-violet-500" },
+        { key: "Cancel", label: "Cancelled", color: "text-slate-300", bar: "bg-slate-500" },
+        { key: "Closed", label: "Completed", color: "text-emerald-400", bar: "bg-emerald-400" }
+      ];
+
+      document.getElementById("kpi-container").innerHTML = kpiItems.map(item => `
+        <div class="stat-tile- rounded-2xl overflow-hidden">
+          <div class="card-header-band px-3.5 py-2 flex items-center justify-between">
+            <span class="text-xs font-extrabold text-white">${item.label}</span>
+            <span class="text-[11px] font-mono-code font-bold text-slate-400">0%</span>
+          </div>
+          <div class="p-3.5 space-y-2">
+            <div class="text-xl font-extrabold font-mono-code ${item.color}">0</div>
+            <div class="w-full h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+              <div class="h-full ${item.bar} rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="pt-1.5 border-t border-white/[0.08] flex items-center justify-between text-[10px] text-slate-300 font-mono-code">
+              <span>Map: <strong class="text-sky-400">0</strong></span>
+              <span>Srv: <strong class="text-emerald-400">0</strong></span>
+              <span>Hnd: <strong class="text-violet-400">0</strong></span>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      const statusPills = ["All Active", "Open", "On Progress", "Pending"];
+      document.getElementById("status-filter-pills").innerHTML = statusPills.map((label, idx) => {
+        const active = idx === 0;
+        return `
+          <button class="${active ? "btn--orange text-slate-950 font-extrabold" : "btn--dark text-slate-300 hover:text-white font-semibold"} px-3 py-1.5 rounded-xl text-xs whitespace-nowrap cursor-pointer">
+            ${label} <span class="font-mono-code opacity-80">(0)</span>
+          </button>
+        `;
+      }).join("");
+
+      renderEmptyPipelineTable();
+    }
+
+    function setActiveTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll(".bi-tab-btn").forEach(btn => {
+        const isCurrent = btn.getAttribute("data-tab") === tab;
+        btn.className = isCurrent
+          ? "bi-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-extrabold btn--orange text-slate-950 cursor-pointer"
+          : "bi-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold btn--dark text-slate-300 hover:text-white cursor-pointer";
+      });
+      renderEmptyPipelineTable();
+    }
+
+    function renderEmptyPipelineTable() {
+      const stagesByTab = {
+        All: ["Mapping", "Survey", "Handover"],
+        Survey: ["Survey", "Report Survey", "BOQ"],
+        Handover: ["Staging", "Materials & Equip.", "Forward WO"],
+        Mapping: ["Onet", "Partner"]
+      };
+      const stages = stagesByTab[activeTab] || stagesByTab.All;
+
+      document.getElementById("main-table-container").innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="table-head-modern text-[11px] font-extrabold uppercase tracking-wider">
+                <th class="py-3.5 px-4 w-12 text-center">#</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4">Customer / ID</th>
+                <th class="py-3.5 px-4 text-center">Pipeline (${stages.join(" → ")})</th>
+                <th class="py-3.5 px-4 text-right">Last Update</th>
+                <th class="py-3.5 px-4 text-center">Logs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6" class="py-12 px-4 text-center">
+                  <div class="max-w-md mx-auto space-y-3">
+                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                      ${stages.map((st, i) => `
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/[0.06] border border-white/15 text-slate-200 shadow-sm">
+                          ${i + 1}. ${st}
+                        </span>
+                      `).join(`<span class="text-slate-500 text-xs">→</span>`)}
+                    </div>
+                    <p class="text-xs font-bold text-slate-200">0 work orders in <span class="text-orange-400">${activeTab}</span></p>
+                    <p class="text-[11px] text-slate-400">Layout siap. Seluruh angka di-set 0 sesuai mode preview.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function toggleNeedAttention() {
+      needAttentionOpen = !needAttentionOpen;
+      const body = document.getElementById("needAttentionBody");
+      const chev = document.getElementById("needAttentionChevron");
+      body.classList.toggle("hidden", !needAttentionOpen);
+      chev.textContent = needAttentionOpen ? "▾" : "▸";
+    }
+
+    function openPreviewModal(title, desc) {
+      document.getElementById("previewModalTitle").textContent = title;
+      document.getElementById("previewModalDesc").textContent = desc;
+      document.getElementById("previewModal").classList.remove("hidden");
+      document.getElementById("previewModal").classList.add("flex");
+    }
+
+    function closePreviewModal() {
+      document.getElementById("previewModal").classList.add("hidden");
+      document.getElementById("previewModal").classList.remove("flex");
+    }
+
+
+    let hubNeedAttentionOpen = true;
+
+    const HUB_NEED_ATTENTION_QUEUE = [
+      {
+        no: 1,
+        customer: "PT. Bahlil Pemain Minyak",
+        ticketId: "SRV-013",
+        status: "Pending",
+        note: "Pelanggan masih diluar kota",
+        assignedDivision: "Business Integration",
+        picBlip: "Michael"
+      },
+      {
+        no: 2,
+        customer: "PT. Gibran Geng Solo",
+        ticketId: "MAP-019",
+        status: "On Progress",
+        note: "Sedang dilakukan pengecekan onsite",
+        assignedDivision: "Business Integration",
+        picBlip: "Robert"
+      },
+      {
+        no: 3,
+        customer: "PT. Prabowo Omon Omon",
+        ticketId: "INL-009",
+        status: "Pending",
+        note: "Akan dilakukan installasi besok",
+        assignedDivision: "Technical Operation",
+        picBlip: "Denish"
+      }
+    ];
+
+    function getStatusBadgeClass(status) {
+      if (status === "On Progress") {
+        return "bg-amber-400/15 text-amber-300 border-amber-400/35";
+      }
+      return "bg-violet-500/15 text-violet-300 border-violet-500/35";
+    }
+
+    function renderHubNeedAttentionQueue() {
+      const tbody = document.getElementById("hub-need-attention-tbody");
+      if (!tbody) return;
+      tbody.innerHTML = HUB_NEED_ATTENTION_QUEUE.map(item => `
+        <tr class="hover:bg-white/[0.03] transition">
+          <td class="py-3.5 px-4 text-center font-mono-code text-slate-400 font-bold">${item.no}</td>
+          <td class="py-3.5 px-4 font-extrabold text-white whitespace-nowrap">${item.customer}</td>
+          <td class="py-3.5 px-4 font-mono-code font-bold text-orange-300 whitespace-nowrap">${item.ticketId}</td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold border ${getStatusBadgeClass(item.status)}">
+              ${item.status}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 text-slate-300">${item.note}</td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-orange-500/15 text-orange-200 border border-orange-500/30">
+              ${item.assignedDivision}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 font-semibold text-white whitespace-nowrap">${item.picBlip}</td>
+        </tr>
+      `).join("");
+    }
+
+    function toggleHubNeedAttention() {
+      hubNeedAttentionOpen = !hubNeedAttentionOpen;
+      const body = document.getElementById("hubNeedAttentionBody");
+      const chev = document.getElementById("hubNeedAttentionChevron");
+      if (body) body.classList.toggle("hidden", !hubNeedAttentionOpen);
+      if (chev) chev.textContent = hubNeedAttentionOpen ? "▾" : "▸";
+    }
+
+    renderSidebarNav();
+    renderHubView();
+    renderHubNeedAttentionQueue();
+  </script>
+</body>
+</html>
